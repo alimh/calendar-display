@@ -173,9 +173,10 @@ useEffect(() => {
 }
 
 export async function getStaticProps() {
-  const siteData = await someService({
-  	client_id: process.env.CLIENT_ID,
+return {
+  props: {
+    client_id: process.env.CLIENT_ID,
     api_key: process.env.API_KEY,
-  })
-  // ...
+  }
+};
 }
