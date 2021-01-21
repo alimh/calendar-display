@@ -2,11 +2,11 @@ import Head from 'next/head';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import styles from '../styles/Home.module.css'
 
-export default function Home() {
+export default function Home(props) {
   const [signedInState, setSignedInState] = useState(false);
 
-  const CLIENT_ID = '63507242688-n50bdqjfiga374n05gjelvoks2a286nf.apps.googleusercontent.com';
-  const API_KEY = 'AIzaSyC96wPL-fh-L93cxuwnyYZW9uAfbEB6Rks';
+  const CLIENT_ID = props.client_id;
+  const API_KEY = props.api_key;
 
   const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
 
@@ -170,4 +170,12 @@ useEffect(() => {
       </main>
     </div>
   )
+}
+
+export async function getStaticProps() {
+  const siteData = await someService({
+  	client_id: process.env.CLIENT_ID,
+    api_key: process.env.API_KEY,
+  })
+  // ...
 }
