@@ -105,7 +105,7 @@ const calList = [
 ];
 const now = new Date();
 const today = new Date(now.toDateString());
-const tomorrow = new Date(today.getTime() + 86400000);
+const tomorrow = new Date(today.getTime() + 7*86400000);
 console.log('today', today);
 console.log('tomorrow', tomorrow);
 const calFetches = [];
