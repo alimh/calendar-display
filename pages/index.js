@@ -91,6 +91,7 @@ console.log(props);
 }
 
 export async function getStaticProps() {
+  console.log('FROM STATIC PROPS:', process.env.PROJECT_ID, process.env.PRIVATE_KEY);
 const auth = await new google.auth.GoogleAuth({
   projectId: process.env.PROJECT_ID,
   credentials: {client_email: process.env.CLIENT_EMAIL, private_key: process.env.PRIVATE_KEY},
