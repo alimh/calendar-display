@@ -138,7 +138,6 @@ await Promise.allSettled(calFetches).then(res => {
   //            return 1;
   // });
 });
-console.log('Events', events);
 //           var events = [];
 //           Promise.allSettled(calFetches).then(function(res) {
 //             res.forEach(function(r) {
