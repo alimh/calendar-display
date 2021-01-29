@@ -70,7 +70,6 @@ export default function Home(props) {
 //             });
 //           });
 //       }
-console.log(props);
   return (
     <div className={styles.container}>
       <Head>
@@ -106,64 +105,52 @@ const calList = [
 ];
 const now = new Date();
 const today = new Date(now.toDateString());
-const tomorrow = new Date(today.getTime() + 7*86400000);
-console.log('today', today);
-console.log('tomorrow', tomorrow);
+const tomorrow = new Date();
+tomorrow.setDate(today.getDate() + 7);
+
 const calFetches = [];
 calList.forEach(c => {
-calFetches.push(cal.events.list({
-  auth,
-  calendarId: c,
-  timeMin: today.toISOString(),
-  timeMax: tomorrow.toISOString(),
-  showDeleted: false,
-  // singleEvents: true,
-}));
+  calFetches.push(cal.events.list({
+    auth,
+    calendarId: c,
+    timeMin: today.toISOString(),
+    timeMax: tomorrow.toISOString(),
+    showDeleted: false,
+    singleEvents: true,
+  }));
 });
+
+console.log(today);
+console.log(tomorrow);
+
 const events = [];
+const eventsSorted = [];
+for(let i = 0; i < 7; i ++) {
+  let tempDate = new Date(new Date().setDate(today.getDate() + i));
+  eventsSorted[i] = {
+    date: tempDate.toUTCString(),
+    events: [],
+  };
+};
+console.log('eventsSorted', eventsSorted);
 await Promise.allSettled(calFetches).then(res => {
   res.forEach(r => {
     if (r.status === 'fulfilled') {
       r.value.data.items.forEach(i => {
-        events.push({ summary: i.summary, when: i.start.dateTime || null, allDay: !!i.start.date })
+        events.push({ summary: i.summary, when: i.start.dateTime || i.start.date || null, allDay: !!i.start.date })
       });
     }
   });
-  // events.sort((a,b) => {
-  //            if(a.allDay) { return -1; } 
-  //            if(b.allDay) { return 1; } 
-  //            var dateA = new Date(a);
-  //            var dateB = new Date(b);
-  //            if(dateA < dateB) { return -1; }
-  //            return 1;
-  // });
+  events.sort((a,b) => {
+             var dateA = new Date(a.when);
+             var dateB = new Date(b.when);
+             if(dateA < dateB) { return -1; }
+             return 1;
+  });
+  events.forEach(e => console.log(e.summary, e.when, new Date(e.when).getDay()));
+
+  console.log(eventsSorted);
 });
-//           var events = [];
-//           Promise.allSettled(calFetches).then(function(res) {
-//             res.forEach(function(r) {
-//               if(r.status === 'fulfilled') {
-//                 r.value.result.items.forEach(function(i) {
-//                   events.push({summary: i.summary, when: i.start.dateTime || null, allDay: !!i.start.date});
-//                 });
-//               }
-//             });
-//             // all events are now in events[]
-//             // sort and display
-//            events.sort(function(a,b) { 
-//              if(a.allDay) { return -1; } 
-//              if(b.allDay) { return 1; } 
-//              var dateA = new Date(a);
-//              var dateB = new Date(b);
-//              if(dateA < dateB) { return -1; }
-//              return 1;
-//            });
-//            editHeader(now.toDateString());
-//            events.forEach(function(e) {
-//              if(e.allDay || e.when === null) appendPre(e.summary);
-//              else appendPre(new Date(e.when).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}) + ': ' + e.summary);
-//             });
-//           });
-//       }
 
 return {
   props: {
