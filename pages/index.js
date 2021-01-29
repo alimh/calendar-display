@@ -169,6 +169,7 @@ return {
   props: {
     header: 'Events for '.concat(today),
     events,
-  }
+  },
+  revalidate: 5,
 };
 }
