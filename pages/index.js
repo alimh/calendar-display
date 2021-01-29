@@ -93,7 +93,7 @@ console.log(props);
 export async function getStaticProps() {
 const auth = await new google.auth.GoogleAuth({
   projectId: process.env.PROJECT_ID,
-  credentials: {client_email: process.env.CLIENT_EMAIL, private_key: process.env.PRIVATE_KEY},
+  credentials: {client_email: process.env.CLIENT_EMAIL, private_key: JSON.parse(process.env.PRIVATE_KEY)},
   scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
 });
 const cal = google.calendar('v3');
