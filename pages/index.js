@@ -3,6 +3,8 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import styles from '../styles/Home.module.css'
 import {google} from 'googleapis';
 
+const getTime = () => {const time = new Date(); return time.toLocaleString(); }
+const getTimezone = () => {return (new Date()).getTimezoneOffset();}
 export default function Home(props) {
 //       /**
 //        * Append a pre element to the body containing the given message
@@ -81,7 +83,8 @@ export default function Home(props) {
       <p id="header">Calendar List</p>
 
 <ul id="event-list">
-{props.events?.map(e => (<li key={e.id}>{e.summary}</li>))}
+<li>{getTime()}</li>
+<li>{getTimezone()}</li>
 </ul>
 
       </main>
@@ -147,15 +150,16 @@ await Promise.allSettled(calFetches).then(res => {
              if(dateA < dateB) { return -1; }
              return 1;
   });
-  events.forEach(e => console.log(e.summary, e.when, new Date(e.when).getDay()));
+  // events.forEach(e => console.log(e.summary, e.when, new Date(e.when).getDay()));
 
+  console.log(events);
   console.log(eventsSorted);
 });
 
 return {
   props: {
     header: 'Events for '.concat(today),
-    events,
+    events: events.filter(e => !!e.summary),
   },
   revalidate: 5,
 };
