@@ -3,89 +3,53 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import styles from '../styles/Home.module.css'
 import {google} from 'googleapis';
 
-const getTime = () => {const time = new Date(); return time.toLocaleString(); }
-const getTimezone = () => {return (new Date()).getTimezoneOffset();}
-export default function Home(props) {
-//       /**
-//        * Append a pre element to the body containing the given message
-//        * as its text node. Used to display the results of the API call.
-//        *
-//        * @param {string} message Text to be placed in pre element.
-//        */
-//       function appendPre(message) {
-//         var ul = document.getElementById('event-list');
-//         var li = document.createElement('li');
-//         var textContent = document.createTextNode(message + '\n');
-//         li.appendChild(textContent);
-//         ul.appendChild(li);
-//       }
+export default function Home({events}) {
 
-//       /**
-//        * Print the summary and start datetime/date of the next ten events in
-//        * the authorized user's calendar. If no events are found an
-//        * appropriate message is printed.
-//        */
-//       async function listUpcomingEvents() {
-//         var now = new Date();
-//         var today = new Date(now.toDateString());
-//         var tomorrow = new Date(today.getTime() + 86400000);
+  const displayEvents = () => {
+    const now = new Date();
+    const todayLocal = new Date(now.toLocaleString());
+    const tomorrowLocal = (new Date(todayLocal)).setDate(todayLocal.getDate() + 7);
+    const eventsFiltered = events.map(e => {
+      const eDate = new Date(e.when);
+      return {...e, when: !e.allDay ? eDate : eDate.setMinutes(eDate.getMinutes() + todayLocal.getTimezoneOffset())};
+    }).
+      filter(e => e.when >= todayLocal && e.when < tomorrowLocal);
 
-//         editHeader(now.toDateString().concat('...'));
-//         // get all the calendar
+    // now that we have filtered events, we can display them in lists
+    let prevDate = '';
+    return eventsFiltered.map((e,i) => {
+      const dateLocal = new Date(e.when).toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'});
+      const timeLocal = !e.allDay ? new Date(e.when).toLocaleTimeString([], {hour: 'numeric', minute: 'numeric'}) : null;
 
-//           var calFetches = [];
-//           calIds.forEach(function(c) {
-//             calFetches.push(gapi.client.calendar.events.list({
-//               'calendarId': c,
-//               'timeMin': today.toISOString(),
-//               'timeMax': tomorrow.toISOString(),
-//               'showDeleted': false,
-//               'singleEvents': true,
-//               'maxResults': 10,
-//               'orderBy': 'startTime'
-//             }));
-//           });
+      const li = ({showDateHeader = false} = {}) => (
+        <div className={todayLocal.toLocaleDateString() !== new Date(e.when).toLocaleDateString() ? styles.eventToday : null}>
+          {showDateHeader ? <div className={styles.eventDate}>{dateLocal}</div> : null}
+          <li key={i}>
+            {timeLocal ? <div className={styles.eventTime}>{timeLocal}</div> : <div className={styles.eventAllDay}>all day</div>}
+            <div className={styles.eventTitle}>{e.summary}</div>
+          </li>
+        </div>
+      );
+          
+      if(dateLocal !== prevDate) {
+        prevDate = dateLocal;
+        return li({showDateHeader: true});
+      }
 
-//           var events = [];
-//           Promise.allSettled(calFetches).then(function(res) {
-//             res.forEach(function(r) {
-//               if(r.status === 'fulfilled') {
-//                 r.value.result.items.forEach(function(i) {
-//                   events.push({summary: i.summary, when: i.start.dateTime || null, allDay: !!i.start.date});
-//                 });
-//               }
-//             });
-//             // all events are now in events[]
-//             // sort and display
-//            events.sort(function(a,b) { 
-//              if(a.allDay) { return -1; } 
-//              if(b.allDay) { return 1; } 
-//              var dateA = new Date(a);
-//              var dateB = new Date(b);
-//              if(dateA < dateB) { return -1; }
-//              return 1;
-//            });
-//            editHeader(now.toDateString());
-//            events.forEach(function(e) {
-//              if(e.allDay || e.when === null) appendPre(e.summary);
-//              else appendPre(new Date(e.when).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}) + ': ' + e.summary);
-//             });
-//           });
-//       }
+      return li();
+    });
+  };
   return (
     <div className={styles.container}>
       <Head>
-        <title>Create Next App</title>
+        <title>My Agenda</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
-      <p id="header">Calendar List</p>
-
-<ul id="event-list">
-<li>{getTime()}</li>
-<li>{getTimezone()}</li>
-</ul>
+        <ul className={styles.list}>
+          {displayEvents()}
+        </ul>
 
       </main>
     </div>
@@ -108,8 +72,9 @@ const calList = [
 ];
 const now = new Date();
 const today = new Date(now.toDateString());
-const tomorrow = new Date();
-tomorrow.setDate(today.getDate() + 7);
+today.setDate(today.getDate() - 1);  // set date to one day before
+const tomorrow = new Date(today);
+tomorrow.setDate(today.getDate() + 8);  // set end date to one day after
 
 const calFetches = [];
 calList.forEach(c => {
@@ -123,19 +88,7 @@ calList.forEach(c => {
   }));
 });
 
-console.log(today);
-console.log(tomorrow);
-
 const events = [];
-const eventsSorted = [];
-for(let i = 0; i < 7; i ++) {
-  let tempDate = new Date(new Date().setDate(today.getDate() + i));
-  eventsSorted[i] = {
-    date: tempDate.toUTCString(),
-    events: [],
-  };
-};
-console.log('eventsSorted', eventsSorted);
 await Promise.allSettled(calFetches).then(res => {
   res.forEach(r => {
     if (r.status === 'fulfilled') {
@@ -150,17 +103,12 @@ await Promise.allSettled(calFetches).then(res => {
              if(dateA < dateB) { return -1; }
              return 1;
   });
-  // events.forEach(e => console.log(e.summary, e.when, new Date(e.when).getDay()));
-
-  console.log(events);
-  console.log(eventsSorted);
 });
 
 return {
   props: {
-    header: 'Events for '.concat(today),
     events: events.filter(e => !!e.summary),
   },
-  revalidate: 5,
+//  revalidate: 5,
 };
 }
