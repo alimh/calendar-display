@@ -16,29 +16,38 @@ export default function Home({events}) {
       filter(e => e.when >= todayLocal && e.when < tomorrowLocal);
 
     // now that we have filtered events, we can display them in lists
-    let prevDate = '';
-    return eventsFiltered.map((e,i) => {
-      const dateLocal = new Date(e.when).toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'});
-      const timeLocal = !e.allDay ? new Date(e.when).toLocaleTimeString([], {hour: 'numeric', minute: 'numeric'}) : null;
-
-      const li = ({showDateHeader = false} = {}) => (
-        <div className={todayLocal.toLocaleDateString() !== new Date(e.when).toLocaleDateString() ? styles.eventToday : null}>
-          {showDateHeader ? <div className={styles.eventDate}>{dateLocal}</div> : null}
-          <li key={i}>
-            {timeLocal ? <div className={styles.eventTime}>{timeLocal}</div> : <div className={styles.eventAllDay}>all day</div>}
-            <div className={styles.eventTitle}>{e.summary}</div>
-          </li>
+    let prevDate = todayLocal.toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'});
+    return (
+      <>
+        <div className={styles.eventToday}>
+          <div className={styles.eventDate}>{prevDate}</div>
+          {todayLocal.toLocaleDateString() !== (new Date(eventsFiltered[0].when)).toLocaleDateString() && <li key='no-events'><div className={styles.eventAllDay}>no events</div></li>}
         </div>
-      );
-          
-      if(dateLocal !== prevDate) {
-        prevDate = dateLocal;
-        return li({showDateHeader: true});
-      }
+        {eventsFiltered.map((e,i) => {
+          const eDate = new Date(e.when);
+          const dateLocal = eDate.toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'});
+          const timeLocal = !e.allDay ? eDate.toLocaleTimeString([], {hour: 'numeric', minute: 'numeric'}) : null;
+          const li = ({showDateHeader = false} = {}) => (
+            <div className={todayLocal.toLocaleDateString() === eDate.toLocaleDateString() ? styles.eventToday : null}>
+              {showDateHeader ? <div className={styles.eventDate}>{dateLocal}</div> : null}
+              <li key={i}>
+                {timeLocal ? <div className={styles.eventTime}>{timeLocal}</div> : <div className={styles.eventAllDay}>all day</div>}
+                <div className={styles.eventTitle}>{e.summary}</div>
+              </li>
+            </div>
+          );
+              
+          if(dateLocal !== prevDate) {
+            prevDate = dateLocal;
+            return li({showDateHeader: true});
+          }
 
-      return li();
-    });
+          return li();
+        })}
+      </>
+    );
   };
+
   return (
     <div className={styles.container}>
       <Head>
