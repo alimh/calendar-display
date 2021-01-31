@@ -18,7 +18,7 @@
 .eventDate {
   font-weight: bold;
   margin-top: 1rem;
-  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
   padding-top: 0.5rem;
   padding-left: 0.5rem;
   color:#75614d;

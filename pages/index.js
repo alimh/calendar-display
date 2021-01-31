@@ -118,6 +118,6 @@ return {
   props: {
     events: events.filter(e => !!e.summary),
   },
-//  revalidate: 5,
+ revalidate: 60*60*6, // reavalidate ever 6 hours
 };
 }
