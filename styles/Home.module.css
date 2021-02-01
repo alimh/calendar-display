@@ -49,6 +49,12 @@
   list-style-type: none;
 }
 
+.footer {
+  margin-left: 2rem;
+  font-size: smaller;
+  color:rgb(77, 71, 71);
+  font-style: italic;
+}
 @media (max-width: 600px) {
   .grid {
     width: 100%;

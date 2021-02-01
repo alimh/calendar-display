@@ -60,6 +60,7 @@ export default function Home({events}) {
           {displayEvents()}
         </ul>
 
+        <div className={styles.footer}>Updated: {(new Date()).toLocaleString()}</div>
       </main>
     </div>
   )
