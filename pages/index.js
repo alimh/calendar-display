@@ -12,14 +12,14 @@ export default function Home({events, updated}) {
 
   const displayEvents = () => {
     const now = new Date();
-    const todayLocal = new Date(now.toLocaleString());
+    const todayLocal = new Date(now.toLocaleDateString());
     const tomorrowLocal = new Date((new Date(todayLocal)).setDate(todayLocal.getDate() + 7));
     const eventsFiltered = events.map(e => {
       const eDate = new Date(e.when);
-      return {...e, when: !e.allDay ? eDate : eDate.setMinutes(eDate.getMinutes() + todayLocal.getTimezoneOffset())};
+//      console.log(e.summary, e.when, !e.allDay ? eDate : new Date(eDate.setMinutes(eDate.getMinutes() + todayLocal.getTimezoneOffset())));
+      return {...e, when: !e.allDay ? eDate : new Date(eDate.setMinutes(eDate.getMinutes() + todayLocal.getTimezoneOffset()))};
     }).
       filter(e => e.when >= todayLocal && e.when < tomorrowLocal);
-
     // now that we have filtered events, we can display them in lists
     let prevDate = todayLocal.toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'});
     return (
@@ -125,7 +125,7 @@ await Promise.allSettled(calFetches).then(res => {
              return 1;
   });
 });
-
+//console.log('Events from server:', events);
 return {
   props: {
     events: events.filter(e => !!e.summary),
