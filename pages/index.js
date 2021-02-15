@@ -3,12 +3,17 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import styles from '../styles/Home.module.css'
 import {google} from 'googleapis';
 
-export default function Home({events}) {
+export default function Home({events, updated}) {
+  const [devMode, setDevMode] = useState(false);
+
+  const tooggleDevMode = () => {
+    setDevMode(!devMode);
+  }
 
   const displayEvents = () => {
     const now = new Date();
     const todayLocal = new Date(now.toLocaleString());
-    const tomorrowLocal = (new Date(todayLocal)).setDate(todayLocal.getDate() + 7);
+    const tomorrowLocal = new Date((new Date(todayLocal)).setDate(todayLocal.getDate() + 7));
     const eventsFiltered = events.map(e => {
       const eDate = new Date(e.when);
       return {...e, when: !e.allDay ? eDate : eDate.setMinutes(eDate.getMinutes() + todayLocal.getTimezoneOffset())};
@@ -19,6 +24,11 @@ export default function Home({events}) {
     let prevDate = todayLocal.toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'});
     return (
       <>
+      {devMode ? <div>
+        Now: {now.toString()}<br />
+        Today Local: {todayLocal.toString()}<br />
+        Tomorrow Local: {tomorrowLocal.toString()}<br />
+      </div> : null}
         <div className={styles.eventToday}>
           <div className={styles.eventDate}>{prevDate}</div>
           {todayLocal.toLocaleDateString() !== (new Date(eventsFiltered[0].when)).toLocaleDateString() && <li key='no-events'><div className={styles.eventAllDay}>no events</div></li>}
@@ -33,6 +43,7 @@ export default function Home({events}) {
               <li key={i}>
                 {timeLocal ? <div className={styles.eventTime}>{timeLocal}</div> : <div className={styles.eventAllDay}>all day</div>}
                 <div className={styles.eventTitle}>{e.summary}</div>
+                {devMode ? <div className={styles.eventTitle}>D: {dateLocal} T:{timeLocal} E:{eDate.toLocaleString()}</div> : null}
               </li>
             </div>
           );
@@ -60,7 +71,7 @@ export default function Home({events}) {
           {displayEvents()}
         </ul>
 
-        <div className={styles.footer}>Updated: {(new Date()).toLocaleString()}</div>
+        <div className={styles.footer}><button onClick={() => tooggleDevMode()}>Updated</button>: {updated}</div>
       </main>
     </div>
   )
@@ -118,6 +129,7 @@ await Promise.allSettled(calFetches).then(res => {
 return {
   props: {
     events: events.filter(e => !!e.summary),
+    updated: now.toLocaleString(),
   },
  revalidate: 60*60*6, // reavalidate ever 6 hours
 };
