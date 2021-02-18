@@ -38,7 +38,7 @@ export default function Home({events, updated}) {
           const dateLocal = eDate.toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'});
           const timeLocal = !e.allDay ? eDate.toLocaleTimeString([], {hour: 'numeric', minute: 'numeric'}) : null;
           const li = ({showDateHeader = false} = {}) => (
-            <div className={todayLocal.toLocaleDateString() === eDate.toLocaleDateString() ? styles.eventNormal : styles.eventToday}>
+            <div className={todayLocal.toLocaleDateString() === eDate.toLocaleDateString() ? styles.eventToday : styles.eventNormal}>
               {showDateHeader ? <div className={styles.eventDate}>{dateLocal}</div> : null}
               <li key={i}>
                 {timeLocal ? <div className={styles.eventTime}>{timeLocal}</div> : <div className={styles.eventAllDay}>all day</div>}
