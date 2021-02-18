@@ -41,6 +41,11 @@
 .eventToday {
   background-color: rgb(243, 200, 200);
 }
+
+.eventNormal {
+  background-color: none;
+}
+
 .list li {
   margin-left: 2rem;
   padding-bottom: 0.5rem;
