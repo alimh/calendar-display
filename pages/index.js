@@ -44,6 +44,7 @@ export default function Home({events, updated}) {
                 {timeLocal ? <div className={styles.eventTime}>{timeLocal}</div> : <div className={styles.eventAllDay}>all day</div>}
                 <div className={styles.eventTitle}>{e.summary}</div>
                 {devMode ? <div className={styles.eventTitle}>D: {dateLocal} T:{timeLocal} E:{eDate.toLocaleString()}</div> : null}
+                {devMode ? <div className={styles.eventTitle}>Left: {todayLocal.toLocaleDateString()} Right:{eDate.toLocaleDateString()}</div> : null}
               </li>
             </div>
           );
